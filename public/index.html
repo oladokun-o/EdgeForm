@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EdgeForms – Instant Form to Email</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-50 text-gray-800">
+    <main class="max-w-3xl mx-auto p-6 text-center">
+      <h1 class="text-4xl font-bold mb-4">EdgeForms</h1>
+      <p class="text-lg mb-6">
+        Drop form data directly to your inbox. No backend. No hassle.
+      </p>
+
+      <pre class="bg-gray-100 p-4 rounded text-left overflow-auto mb-6">
+&lt;form action="https://edgeforms.nxtedgestudio.com/submit" method="POST"&gt;
+  &lt;input name="name" placeholder="Name" required /&gt;
+  &lt;input type="email" name="email" placeholder="Email" required /&gt;
+  &lt;textarea name="message" placeholder="Message"&gt;&lt;/textarea&gt;
+  &lt;button type="submit"&gt;Send&lt;/button&gt;
+&lt;/form&gt;
+    </pre>
+      >
+
+      <p class="mb-2">
+        📬 Form submissions will be emailed to the address you configure.
+      </p>
+      <p class="text-sm text-gray-500 mb-6">
+        Add a hidden "_gotcha" field to prevent spam.
+      </p>
+
+      <footer class="text-sm text-gray-400">
+        Built by
+        <a href="https://nxtedgestudio.com" class="underline">NxtEdge Studio</a>
+        · MIT License
+      </footer>
+    </main>
+  </body>
+</html>
