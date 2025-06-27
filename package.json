@@ -6,14 +6,18 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ."
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["edgeform", "form", "submission", "nodemailer", "resend", "rate-limiter"],
+  "author": "Oladokun O.",
   "license": "ISC",
-  "description": "",
+  "description": "A simple form submission handler using Node.js, Nodemailer, and Resend",
   "dependencies": {
     "dotenv": "^17.0.0",
     "nodemailer": "^7.0.3",
     "rate-limiter-flexible": "^7.1.1",
     "resend": "^4.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oladokun-o/EdgeForm.git"
   }
 }
