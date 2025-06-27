@@ -6,7 +6,32 @@ const rateLimiter = new RateLimiterMemory({
   duration: 60, // per 60 seconds
 });
 
+const allowedOrigins = [
+  "https://nxtedgestudio.com",
+  "https://goault.com",
+  "https://edgeforms.nxtedgestudio.com",
+  "https://ault-v2.netlify.app",
+];
+
 export default async function handler(req, res) {
+  const origin = req.headers.origin;
+
+  if (!allowedOrigins.includes(origin)) {
+    return res.status(403).json({ error: "Forbidden: Origin not allowed" });
+  }
+
+  // Handle preflight (CORS OPTIONS request)
+  if (req.method === "OPTIONS") {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    return res.status(204).end(); // No Content
+  }
+
+  // Set CORS headers for actual request
+  res.setHeader("Access-Control-Allow-Origin", origin);
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   if (req.method !== "POST") return res.status(405).end("Method Not Allowed");
 
   const data = req.body;
