@@ -15,6 +15,18 @@ const allowedOrigins = [
   "https://ault-v2.netlify.app",
 ];
 
+const readTemplate = (filename) => {
+  const filePath = path.join(process.cwd(), "templates", filename);
+  return fs.readFileSync(filePath, "utf-8");
+};
+
+const fillTemplate = (template, data) => {
+  return Object.entries(data).reduce(
+    (acc, [key, value]) => acc.replaceAll(`{{${key}}}`, value || "-"),
+    template
+  );
+};
+
 export default async function handler(req, res) {
   const origin = req.headers.origin;
 
@@ -54,29 +66,39 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Spam detected" });
   }
 
+  const timestamp = new Date().toLocaleString("en-GB", {
+    timeZone: "Africa/Lagos",
+    dateStyle: "medium",
+    timeStyle: "short",
+  });
+
+  const internalHtml = fillTemplate(readTemplate("goault-internal.html"), {
+    ...data,
+    timestamp,
+  });
+
+  const replyHtml = fillTemplate(readTemplate("goault-welcome.html"), {
+    fullName: data.fullName || "there",
+  });
+
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT || 587),
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
   try {
-    // Format all fields into HTML
-    const html = Object.entries(data)
-      .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`)
-      .join("");
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT || 587),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
     // ✅ 1. Send to internal team
     await transporter.sendMail({
       from: `"Form Submission" <${process.env.SMTP_USER}>`, // Use SMTP_USER as the sender
       replyTo: `"Form Submission" <${process.env.FROM_EMAIL}>`, // Use FROM_EMAIL as the reply-to address
       to: process.env.TO_EMAIL,
       subject: "New Form Submission",
-      html,
+      html: internalHtml,
       headers: {
         "X-Form-Submission": "EdgeForm",
         "X-Form-Origin": origin,
@@ -85,26 +107,21 @@ export default async function handler(req, res) {
     });
 
     // ✅ 2. Auto-reply to user
-    try {
-      const templatePath = path.join(
-        process.cwd(),
-        "emails",
-        "goault-welcome.html"
-      );
-      let autoReplyHtml = fs.readFileSync(templatePath, "utf-8");
-
-      await transporter.sendMail({
-        from: `"AULT" <${process.env.SMTP_USER}>`,
-        replyTo: `"AULT" <${process.env.FROM_EMAIL}>`, // Use FROM_EMAIL as the reply-to address
-        to: data.email,
-        subject: "Your Journey To More Begins Here",
-        html: autoReplyHtml,
-        headers: {
-          "X-Auto-Reply": "true",
-        },
-      });
-    } catch (err) {
-      console.error("Auto-reply send error:", err);
+    if (data.email) {
+      try {
+        await transporter.sendMail({
+          from: `"AULT" <${process.env.SMTP_USER}>`,
+          replyTo: `"AULT" <${process.env.FROM_EMAIL}>`, // Use FROM_EMAIL as the reply-to address
+          to: data.email,
+          subject: "Your Journey To More Begins Here",
+          html: replyHtml,
+          headers: {
+            "X-Auto-Reply": "true",
+          },
+        });
+      } catch (err) {
+        console.error("Auto-reply send error:", err);
+      }
     }
 
     return res.status(200).json({ success: true, message: "Email sent" });
