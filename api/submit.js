@@ -16,7 +16,7 @@ const allowedOrigins = [
 ];
 
 const readTemplate = (filename) => {
-  const filePath = path.join(process.cwd(), "templates", filename);
+  const filePath = path.join(process.cwd(), "emails", filename);
   return fs.readFileSync(filePath, "utf-8");
 };
 
