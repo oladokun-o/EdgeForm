@@ -74,6 +74,11 @@ export default async function handler(req, res) {
       to: process.env.TO_EMAIL,
       subject: "New Form Submission",
       html,
+      headers: {
+        "X-Form-Submission": "EdgeForm",
+        "X-Form-Origin": origin,
+        "X-Form-Submitted-At": new Date().toISOString(),
+      },
     });
 
     return res.status(200).json({ success: true, message: "Email sent" });
