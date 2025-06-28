@@ -6,13 +6,22 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node ."
   },
-  "keywords": ["edgeform", "form", "submission", "nodemailer", "resend", "rate-limiter"],
+  "keywords": [
+    "edgeform",
+    "form",
+    "submission",
+    "nodemailer",
+    "resend",
+    "rate-limiter"
+  ],
   "author": "Oladokun O.",
   "license": "ISC",
   "description": "A simple form submission handler using Node.js, Nodemailer, and Resend",
   "dependencies": {
     "dotenv": "^17.0.0",
+    "fs": "^0.0.1-security",
     "nodemailer": "^7.0.3",
+    "path": "^0.12.7",
     "rate-limiter-flexible": "^7.1.1",
     "resend": "^4.6.0"
   },

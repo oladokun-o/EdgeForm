@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import nodemailer from "nodemailer";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 
@@ -68,6 +70,7 @@ export default async function handler(req, res) {
       },
     });
 
+    // ✅ 1. Send to internal team
     await transporter.sendMail({
       from: `"Form Submission" <${process.env.SMTP_USER}>`, // Use SMTP_USER as the sender
       replyTo: `"Form Submission" <${process.env.FROM_EMAIL}>`, // Use FROM_EMAIL as the reply-to address
@@ -80,6 +83,29 @@ export default async function handler(req, res) {
         "X-Form-Submitted-At": new Date().toISOString(),
       },
     });
+
+    // ✅ 2. Auto-reply to user
+    try {
+      const templatePath = path.join(
+        process.cwd(),
+        "emails",
+        "goault-welcome.html"
+      );
+      let autoReplyHtml = fs.readFileSync(templatePath, "utf-8");
+
+      await transporter.sendMail({
+        from: `"AULT" <${process.env.SMTP_USER}>`,
+        replyTo: `"AULT" <${process.env.FROM_EMAIL}>`, // Use FROM_EMAIL as the reply-to address
+        to: data.email,
+        subject: "Your Journey To More Begins Here",
+        html: autoReplyHtml,
+        headers: {
+          "X-Auto-Reply": "true",
+        },
+      });
+    } catch (err) {
+      console.error("Auto-reply send error:", err);
+    }
 
     return res.status(200).json({ success: true, message: "Email sent" });
   } catch (error) {
