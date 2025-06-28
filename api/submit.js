@@ -95,9 +95,8 @@ export default async function handler(req, res) {
     // ✅ 1. Send to internal team
     await transporter.sendMail({
       from: `"Form Submission" <${process.env.SMTP_USER}>`, // Use SMTP_USER as the sender
-      replyTo: `"Form Submission" <${process.env.FROM_EMAIL}>`, // Use FROM_EMAIL as the reply-to address
       to: process.env.TO_EMAIL,
-      subject: "New Form Submission",
+      subject: `New AULT Form Submission — ${data.fullName || "Unknown"}`,
       html: internalHtml,
       headers: {
         "X-Form-Submission": "EdgeForm",
